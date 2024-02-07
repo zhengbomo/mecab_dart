@@ -8,8 +8,20 @@
 #import "mecab_dart-Swift.h"
 #endif
 
+// global method for ffi
+void* initMecab(const char* opt, const char* dicdir);
+void destroyMecab(void* mecab);
+const char* parse(void* mecab, const char* input);
+
 @implementation MecabDartPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   [SwiftMecabDartPlugin registerWithRegistrar:registrar];
+  
+  // make global method used（prevent link strip）
+  if (arc4random() % 2 > 2) {
+    initMecab(NULL, NULL);
+    destroyMecab(NULL);
+    parse(NULL, NULL);
+  }
 }
 @end

@@ -2,34 +2,24 @@ package com.example.mecab_dart
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** MecabDartPlugin */
 public class MecabDartPlugin: FlutterPlugin, MethodCallHandler {
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "mecab_dart")
-    channel.setMethodCallHandler(MecabDartPlugin());
+  private var methodChannel: MethodChannel? = null
+
+  override fun onAttachedToEngine(binding: FlutterPluginBinding) {
+      methodChannel = MethodChannel(binding.binaryMessenger, CHANNEL_NAME)
+      methodChannel!!.setMethodCallHandler(this)
   }
 
-  // This static function is optional and equivalent to onAttachedToEngine. It supports the old
-  // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
-  // plugin registration via this function while apps migrate to use the new Android APIs
-  // post-flutter-1.12 via https://flutter.dev/go/android-project-migration.
-  //
-  // It is encouraged to share logic between onAttachedToEngine and registerWith to keep
-  // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
-  // depending on the user's project. onAttachedToEngine or registerWith must both be defined
-  // in the same class.
-  companion object {
-    @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), "mecab_dart")
-      channel.setMethodCallHandler(MecabDartPlugin())
-    }
+  override fun onDetachedFromEngine(binding: FlutterPluginBinding) {
+      methodChannel!!.setMethodCallHandler(null)
+      methodChannel = null
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -40,6 +30,7 @@ public class MecabDartPlugin: FlutterPlugin, MethodCallHandler {
     }
   }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+  companion object {
+    private const val CHANNEL_NAME = "mecab_dart"
   }
 }
